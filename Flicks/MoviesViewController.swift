@@ -8,6 +8,7 @@
 
 import UIKit
 import AFNetworking
+import MBProgressHUD
 
 class MoviesViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UISearchBarDelegate {
     
@@ -26,12 +27,6 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         collectionView.delegate = self
         searchBar.delegate = self
         filteredData = movies
-        
-        // Flow Layout properties
-        flowLayout.scrollDirection = .Vertical
-        flowLayout.minimumLineSpacing = 0
-        flowLayout.minimumInteritemSpacing = 0
-        flowLayout.sectionInset = UIEdgeInsetsMake(0, 0, 0, 0)
 
         let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
         let url = NSURL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
@@ -42,8 +37,15 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
             delegateQueue:NSOperationQueue.mainQueue()
         )
         
+        // Display HUD right before the request is made
+        MBProgressHUD.showHUDAddedTo(self.view, animated: true)
+        
         let task : NSURLSessionDataTask = session.dataTaskWithRequest(request,
             completionHandler: { (dataOrNil, response, error) in
+                
+                // Hide HUD once the network request comes back (must be done on main UI thread)
+                MBProgressHUD.hideHUDForView(self.view, animated: true)
+                
                 if let data = dataOrNil {
                     if let responseDictionary = try! NSJSONSerialization.JSONObjectWithData(
                         data, options:[]) as? NSDictionary {
@@ -69,14 +71,6 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         
         collectionView.reloadData()
     }
-    
-    // MARK: UICollectionViewDelegateFlowLayout methods
-//    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
-////        let totalwidth = collectionView.bounds.size.width;
-////        let numberOfCellsPerRow = 2
-////        let dimensions_width = CGFloat(Int(totalwidth) / numberOfCellsPerRow)
-////        return CGSizeMake(dimensions_width, dimensions)
-//    }
     
     // MARK: UICollectionViewDelegate methods
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
