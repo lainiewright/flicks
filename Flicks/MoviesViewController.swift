@@ -9,15 +9,29 @@
 import UIKit
 import AFNetworking
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-    @IBOutlet weak var tableView: UITableView!
+class MoviesViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UISearchBarDelegate {
+    
+    @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
+    @IBOutlet weak var searchBar: UISearchBar!
     
     var movies: [NSDictionary]?
+    
+    var filteredData: [NSDictionary]!
+    var searchActive: Bool! = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.dataSource = self
-        tableView.delegate = self
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        searchBar.delegate = self
+        filteredData = movies
+        
+        // Flow Layout properties
+        flowLayout.scrollDirection = .Vertical
+        flowLayout.minimumLineSpacing = 0
+        flowLayout.minimumInteritemSpacing = 0
+        flowLayout.sectionInset = UIEdgeInsetsMake(0, 0, 0, 0)
 
         let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
         let url = NSURL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
@@ -33,9 +47,9 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                 if let data = dataOrNil {
                     if let responseDictionary = try! NSJSONSerialization.JSONObjectWithData(
                         data, options:[]) as? NSDictionary {
-                            NSLog("response: \(responseDictionary)")
+                            //NSLog("response: \(responseDictionary)")
                             self.movies = responseDictionary["results"] as! [NSDictionary]
-                            self.tableView.reloadData()
+                            self.collectionView.reloadData()
                     }
                 }
         });
@@ -47,40 +61,54 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         // Dispose of any resources that can be recreated.
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if let movies = movies {
+    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+        
+        filteredData = searchText.isEmpty ? movies : movies!.filter({(data: NSDictionary) -> Bool in
+            return data["title"]!.rangeOfString(searchText, options: .CaseInsensitiveSearch).location != NSNotFound
+        })
+        
+        collectionView.reloadData()
+    }
+    
+    // MARK: UICollectionViewDelegateFlowLayout methods
+//    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+////        let totalwidth = collectionView.bounds.size.width;
+////        let numberOfCellsPerRow = 2
+////        let dimensions_width = CGFloat(Int(totalwidth) / numberOfCellsPerRow)
+////        return CGSizeMake(dimensions_width, dimensions)
+//    }
+    
+    // MARK: UICollectionViewDelegate methods
+    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if let filtered = filteredData {
+            return filtered.count
+        } else if let movies = movies {
             return movies.count
         } else {
             return 0
         }
     }
-    
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("MovieCell", forIndexPath: indexPath) as! MovieCell
+
+
+    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         
-        let movie = movies![indexPath.row]
-        let title = movie["title"] as! String
-        let overview = movie["overview"] as! String
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("MovieCell", forIndexPath: indexPath) as! MovieCell
+        var movie: NSDictionary
+        
+        print(indexPath.row)
+        
+        if filteredData != nil {
+            movie = filteredData[indexPath.row]
+        } else {
+            movie = movies![indexPath.row]
+        }
+        
         let posterPath = movie["poster_path"] as! String
-        
         let baseUrl = "http://image.tmdb.org/t/p/w500"
         let imageUrl = NSURL(string: baseUrl + posterPath)
-        
-        cell.titleLabel.text = title
-        cell.overviewLabel.text = overview
-        cell.posterView.setImageWithURL(imageUrl!)
+        cell.movieImageView.setImageWithURL(imageUrl!)
         
         return cell
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }
