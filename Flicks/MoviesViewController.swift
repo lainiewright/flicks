@@ -161,4 +161,7 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         return cell
     }
 
+    @IBAction func onTap(sender: AnyObject) {
+        view.endEditing(true)
+    }
 }
