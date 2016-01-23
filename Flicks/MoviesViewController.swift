@@ -116,6 +116,18 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         collectionView.reloadData()
     }
     
+    func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
+        self.searchBar.showsCancelButton = true
+    }
+    
+    func searchBarCancelButtonClicked(searchBar: UISearchBar) {
+        searchBar.showsCancelButton = false
+        searchBar.text = ""
+        searchBar.resignFirstResponder()
+        filteredData = movies
+        collectionView.reloadData()
+    }
+    
     // MARK: UICollectionViewDelegate methods
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if let filtered = filteredData {
