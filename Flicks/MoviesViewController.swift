@@ -23,6 +23,12 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Initialize a UIRefreshControl
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: "refreshControlAction:", forControlEvents: UIControlEvents.ValueChanged)
+        collectionView.insertSubview(refreshControl, atIndex: 0)
+        
         collectionView.dataSource = self
         collectionView.delegate = self
         searchBar.delegate = self
@@ -61,6 +67,44 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    // Makes a network request to get updated data
+    // Updates the tableView with the new data
+    // Hides the RefreshControl
+    func refreshControlAction(refreshControl: UIRefreshControl) {
+        
+        // ... Create the NSURLRequest (myRequest) ...
+        
+        // Configure session so that completion handler is executed on main UI thread
+        let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
+        let url = NSURL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
+        let request = NSURLRequest(URL: url!)
+        let session = NSURLSession(
+            configuration: NSURLSessionConfiguration.defaultSessionConfiguration(),
+            delegate:nil,
+            delegateQueue:NSOperationQueue.mainQueue()
+        )
+        
+        let task : NSURLSessionDataTask = session.dataTaskWithRequest(request,
+            completionHandler: { (dataOrNil, response, error) in
+                
+                // Hide HUD once the network request comes back (must be done on main UI thread)
+                MBProgressHUD.hideHUDForView(self.view, animated: true)
+                
+                if let data = dataOrNil {
+                    if let responseDictionary = try! NSJSONSerialization.JSONObjectWithData(
+                        data, options:[]) as? NSDictionary {
+                            //NSLog("response: \(responseDictionary)")
+                            self.movies = responseDictionary["results"] as! [NSDictionary]
+                            self.collectionView.reloadData()
+                    }
+                }
+                
+                // Tell the refreshControl to stop spinning
+                refreshControl.endRefreshing()
+        });
+        task.resume()
     }
     
     func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
