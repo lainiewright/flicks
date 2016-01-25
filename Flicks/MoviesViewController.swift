@@ -24,6 +24,8 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        collectionView.allowsSelection = true
+        
         // Initialize a UIRefreshControl
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: "refreshControlAction:", forControlEvents: UIControlEvents.ValueChanged)
@@ -153,15 +155,28 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
             movie = movies![indexPath.row]
         }
         
-        let posterPath = movie["poster_path"] as! String
         let baseUrl = "http://image.tmdb.org/t/p/w500"
-        let imageUrl = NSURL(string: baseUrl + posterPath)
-        cell.movieImageView.setImageWithURL(imageUrl!)
+        
+        if let posterPath = movie["poster_path"] as? String {
+            let imageUrl = NSURL(string: baseUrl + posterPath)
+            cell.movieImageView.setImageWithURL(imageUrl!)
+        }
         
         return cell
     }
-
-    @IBAction func onTap(sender: AnyObject) {
-        view.endEditing(true)
+    
+    
+    // MARK: - Navigation
+    
+    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        let cell = sender as! UICollectionViewCell
+        let indexPath = collectionView.indexPathForCell(cell)
+        let movie = movies![indexPath!.row]
+        
+        let detailsViewController = segue.destinationViewController as! DetailsViewController
+        detailsViewController.movie = movie
     }
+
+
 }
