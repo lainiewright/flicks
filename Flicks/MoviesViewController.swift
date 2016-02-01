@@ -38,6 +38,11 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         searchBar.delegate = self
         navigationItem.titleView = searchBar
         filteredData = movies
+        
+        // Flow Layout properties
+        flowLayout.minimumLineSpacing = 0
+        flowLayout.minimumInteritemSpacing = 0
+        flowLayout.sectionInset = UIEdgeInsetsMake(0, 0, 0, 0)
 
         let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
         let url = NSURL(string:"https://api.themoviedb.org/3/movie/\(endpoint)?api_key=\(apiKey)")
@@ -69,6 +74,16 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         task.resume()
     }
 
+    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout,sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+        
+        let totalwidth = collectionView.bounds.size.width;
+        let numberOfCellsPerRow = 2
+        
+        let dimensions = CGFloat(Int(totalwidth) / numberOfCellsPerRow)
+        return CGSizeMake(dimensions, dimensions * 1.5)
+
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
