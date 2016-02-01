@@ -49,6 +49,24 @@
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <textInputTraits key="textInputTraits"/>
                             </searchBar>
+                            <view opaque="NO" alpha="0.80000000000000004" contentMode="scaleToFill" id="NuA-0B-UcJ">
+                                <rect key="frame" x="0.0" y="64" width="320" height="42"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Network Error" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="S4D-jd-c6p">
+                                        <rect key="frame" x="122" y="10" width="115" height="21"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                        <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" id="Dnd-sg-eIX">
+                                        <rect key="frame" x="86" y="4" width="34" height="34"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <gestureRecognizers/>
@@ -56,6 +74,8 @@
                     <navigationItem key="navigationItem" id="gsd-Wh-kUk"/>
                     <connections>
                         <outlet property="collectionView" destination="Vcx-J6-zjn" id="6cf-SA-jw3"/>
+                        <outlet property="errorImage" destination="Dnd-sg-eIX" id="S2X-zm-88k"/>
+                        <outlet property="errorView" destination="NuA-0B-UcJ" id="58h-z4-h5T"/>
                         <outlet property="flowLayout" destination="YZc-6J-hZy" id="Hit-C1-tQ8"/>
                         <outlet property="searchBar" destination="ddU-Nl-5SF" id="e2n-JJ-SMf"/>
                     </connections>
@@ -67,7 +87,7 @@
                     </connections>
                 </tapGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="613" y="341"/>
+            <point key="canvasLocation" x="465" y="330"/>
         </scene>
         <!--Details-->
         <scene sceneID="09y-9z-tGW">

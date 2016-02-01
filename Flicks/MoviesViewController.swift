@@ -15,6 +15,9 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     @IBOutlet weak var searchBar: UISearchBar!
+    @IBOutlet weak var errorImage: UIImageView!
+    @IBOutlet weak var errorView: UIView!
+    
     
     var movies: [NSDictionary]?
     
@@ -27,6 +30,9 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         super.viewDidLoad()
         
         collectionView.allowsSelection = true
+        
+        errorImage.image = UIImage(named: "network_error")
+        errorView.hidden = true
         
         // Initialize a UIRefreshControl
         let refreshControl = UIRefreshControl()
@@ -69,6 +75,8 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
                             self.movies = responseDictionary["results"] as! [NSDictionary]
                             self.collectionView.reloadData()
                     }
+                } else {
+                    self.errorView.hidden = false
                 }
         });
         task.resume()
@@ -90,7 +98,7 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
     }
     
     // Makes a network request to get updated data
-    // Updates the tableView with the new data
+    // Updates the collectionView with the new data
     // Hides the RefreshControl
     func refreshControlAction(refreshControl: UIRefreshControl) {
         
@@ -119,6 +127,8 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
                             self.movies = responseDictionary["results"] as! [NSDictionary]
                             self.collectionView.reloadData()
                     }
+                } else {
+                    self.errorView.hidden = false
                 }
                 
                 // Tell the refreshControl to stop spinning
@@ -129,9 +139,11 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
     
     func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
         
-        filteredData = searchText.isEmpty ? movies : movies!.filter({(data: NSDictionary) -> Bool in
-            return data["title"]!.rangeOfString(searchText, options: .CaseInsensitiveSearch).location != NSNotFound
-        })
+        if let movies = movies {
+            filteredData = searchText.isEmpty ? movies : movies.filter({(data: NSDictionary) -> Bool in
+                return data["title"]!.rangeOfString(searchText, options: .CaseInsensitiveSearch).location != NSNotFound
+            })
+        }
         
         collectionView.reloadData()
     }
@@ -179,7 +191,27 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         
         if let posterPath = movie["poster_path"] as? String {
             let imageUrl = NSURL(string: baseUrl + posterPath)
-            cell.movieImageView.setImageWithURL(imageUrl!)
+            let imageRequest = NSURLRequest(URL: imageUrl!)
+            
+            cell.movieImageView.setImageWithURLRequest(
+                imageRequest,
+                placeholderImage: nil,
+                success: { (imageRequest, imageResponse, image) -> Void in
+                    
+                    // imageResponse will be nil if the image is cached
+                    if imageResponse != nil {
+                        cell.movieImageView.alpha = 0.0
+                        cell.movieImageView.image = image
+                        UIView.animateWithDuration(0.5, animations: { () -> Void in
+                            cell.movieImageView.alpha = 1.0
+                        })
+                    } else {
+                        cell.movieImageView.image = image
+                    }
+                },
+                failure: { (imageRequest, imageResponse, error) -> Void in
+                    cell.movieImageView.setImageWithURL(imageUrl!)
+            })
         }
         
         // Use a red color when the user selects the cell
