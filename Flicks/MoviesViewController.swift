@@ -20,6 +20,8 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
     
     var filteredData: [NSDictionary]!
     var searchActive: Bool! = false
+    
+    var endpoint: String!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,10 +36,11 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         collectionView.dataSource = self
         collectionView.delegate = self
         searchBar.delegate = self
+        navigationItem.titleView = searchBar
         filteredData = movies
 
         let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
-        let url = NSURL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
+        let url = NSURL(string:"https://api.themoviedb.org/3/movie/\(endpoint)?api_key=\(apiKey)")
         let request = NSURLRequest(URL: url!)
         let session = NSURLSession(
             configuration: NSURLSessionConfiguration.defaultSessionConfiguration(),
@@ -130,6 +133,10 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         collectionView.reloadData()
     }
     
+    func searchBarSearchButtonClicked(searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+    }
+    
     // MARK: UICollectionViewDelegate methods
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if let filtered = filteredData {
@@ -147,8 +154,6 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("MovieCell", forIndexPath: indexPath) as! MovieCell
         var movie: NSDictionary
         
-        print(indexPath.row)
-        
         if filteredData != nil {
             movie = filteredData[indexPath.row]
         } else {
@@ -161,6 +166,11 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UIColl
             let imageUrl = NSURL(string: baseUrl + posterPath)
             cell.movieImageView.setImageWithURL(imageUrl!)
         }
+        
+        // Use a red color when the user selects the cell
+        let backgroundView = UIView()
+        backgroundView.backgroundColor = UIColor.grayColor()
+        cell.selectedBackgroundView = backgroundView
         
         return cell
     }
