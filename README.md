@@ -29,7 +29,7 @@ The following **additional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-<a href="http://imgur.com/YwhFp4b"><img src="http://i.imgur.com/YwhFp4b.gif" title="source: imgur.com" /></a>
+<a href="http://imgur.com/ZyaZgsw"><img src="http://i.imgur.com/ZyaZgsw.gif" title="source: imgur.com" /></a>
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
@@ -87,7 +87,7 @@ Please list two areas of the assignment you'd like to **discuss further with you
 
 Here's a walkthrough of implemented user stories:
 
-<a href="http://imgur.com/RW39WEE"><img src="http://i.imgur.com/RW39WEE.gif" title="source: imgur.com" /></a>
+<a href="http://imgur.com/YwhFp4b"><img src="http://i.imgur.com/YwhFp4b.gif" title="source: imgur.com" /></a>
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
